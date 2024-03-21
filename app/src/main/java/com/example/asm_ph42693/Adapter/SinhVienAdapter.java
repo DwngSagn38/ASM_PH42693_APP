@@ -1,13 +1,17 @@
 package com.example.asm_ph42693.Adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,29 +36,32 @@ import retrofit2.Response;
 public class SinhVienAdapter extends RecyclerView.Adapter<SinhVienAdapter.viewHolder> {
     private final Context context;
     private List<SinhVien> list;
+    Home home;
+
 
     public SinhVienAdapter(Context context, List<SinhVien> list) {
         this.context = context;
         this.list = list;
+        home = (Home) context;
     }
 
     @NonNull
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.item_sinhvien,parent,false);
+        View view = inflater.inflate(R.layout.item_sinhvien, parent, false);
         return new viewHolder(view);
     }
 
     @SuppressLint("RecyclerView")
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        if (position >= 0 && position <= list.size()){
+        if (position >= 0 && position <= list.size()) {
             SinhVien sv = list.get(position);
 
-            holder.txtMaSV.setText("Mã SV : "+sv.getMasv());
-            holder.txtNameSV.setText("Họ tên : "+sv.getName());
-            holder.txtDiemTB.setText("Điểm TB : "+sv.getPoint());
+            holder.txtMaSV.setText("Mã SV : " + sv.getMasv());
+            holder.txtNameSV.setText("Họ tên : " + sv.getName());
+            holder.txtDiemTB.setText("Điểm TB : " + sv.getPoint());
 
             Glide.with(holder.itemView.getContext())
                     .load(sv.getAvatar())
@@ -68,14 +75,14 @@ public class SinhVienAdapter extends RecyclerView.Adapter<SinhVienAdapter.viewHo
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Cảnh báo");
                     builder.setMessage("Bạn có muốn xóa không?");
-                    builder.setNegativeButton("No",null);
+                    builder.setNegativeButton("No", null);
                     builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             ApiService.apiService.deleteStudent(idStudent).enqueue(new Callback<SinhVien>() {
                                 @Override
                                 public void onResponse(Call<SinhVien> call, Response<SinhVien> response) {
-                                    if (response.isSuccessful()){
+                                    if (response.isSuccessful()) {
                                         Toast.makeText(context, "Delete success", Toast.LENGTH_SHORT).show();
                                         list.remove(position);
                                         notifyDataSetChanged();
@@ -96,8 +103,7 @@ public class SinhVienAdapter extends RecyclerView.Adapter<SinhVienAdapter.viewHo
             holder.btnUpdate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Home home = new Home();
-                    home.showDialog(context,list.get(position),0);
+                    home.showDialog(context, sv, 0, list);
                 }
             });
 
@@ -105,9 +111,10 @@ public class SinhVienAdapter extends RecyclerView.Adapter<SinhVienAdapter.viewHo
         }
     }
 
+
     @Override
     public int getItemCount() {
-        if (list.size() > 0){
+        if (list.size() > 0) {
             return list.size();
         }
         return 0;
@@ -116,7 +123,8 @@ public class SinhVienAdapter extends RecyclerView.Adapter<SinhVienAdapter.viewHo
     public static class viewHolder extends RecyclerView.ViewHolder {
         TextView txtNameSV, txtMaSV, txtDiemTB;
         ImageView imgAvatar;
-        ImageButton btnUpdate,btnDelete;
+        ImageButton btnUpdate, btnDelete;
+
         public viewHolder(@NonNull View itemView) {
             super(itemView);
             txtNameSV = itemView.findViewById(R.id.txtNameSV);
@@ -127,4 +135,6 @@ public class SinhVienAdapter extends RecyclerView.Adapter<SinhVienAdapter.viewHo
             btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
+
+
 }

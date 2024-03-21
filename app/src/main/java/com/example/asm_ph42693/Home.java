@@ -59,35 +59,35 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class Home extends AppCompatActivity {
 
     private static final int MY_REQUEST_CODE = 10;
-    TextView txt;
     List<SinhVien> list = new ArrayList<>();
-    SinhVienAdapter adapter;
-    RecyclerView rcvSV;
+
     FloatingActionButton fltadd;
     ImageView imagePiker;
     private  Uri mUri;
+
+    public RecyclerView rcvSV ;
+    public SinhVienAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        rcvSV = findViewById(R.id.rcvSV);
         fltadd = findViewById(R.id.fltadd);
-        txt = findViewById(R.id.txt);
+        rcvSV = findViewById(R.id.rcvSV);
 
         loadData();
 
         fltadd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showDialog(Home.this,new SinhVien(),1);
+                showDialog(Home.this,new SinhVien(),1,list);
             }
         });
     }
 
 
-    public void showDialog (Context context, SinhVien sinhVien, Integer type){
+    public void showDialog (Context context, SinhVien sinhVien, Integer type, List<SinhVien> list){
         AlertDialog.Builder builder=new AlertDialog.Builder(context);
         LayoutInflater inflater= ((Activity) context).getLayoutInflater();
         View view=inflater.inflate(R.layout.dialog_add_sinhvien,null);
@@ -124,7 +124,7 @@ public class Home extends AppCompatActivity {
                     Toast.makeText(context, "Điểm trung bình phải là số", Toast.LENGTH_SHORT).show();
                 } else {
                     Double point = Double.parseDouble(diemTB);
-                    if (point <= 0 || point >= 10){
+                    if (point < 0 || point > 10){
                         Toast.makeText(context, "Điểm phải từ 0-10", Toast.LENGTH_SHORT).show();
                     }else {
                         SinhVien sv = new SinhVien(masv,name,point,avatar);
@@ -143,8 +143,8 @@ public class Home extends AppCompatActivity {
                                     if (type == 0){
                                         msg = "Update success";
                                     }
-                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
                                     loadData();
+                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }
                             }
@@ -213,6 +213,7 @@ public class Home extends AppCompatActivity {
     }
 
     public void loadData (){
+
         Call<List<SinhVien>> call = ApiService.apiService.getData();
 
         call.enqueue(new Callback<List<SinhVien>>() {
