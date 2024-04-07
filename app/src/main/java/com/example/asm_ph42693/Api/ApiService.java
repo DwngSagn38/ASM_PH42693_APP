@@ -1,6 +1,8 @@
 package com.example.asm_ph42693.Api;
 
+import com.example.asm_ph42693.Modal.Response;
 import com.example.asm_ph42693.Modal.SinhVien;
+import com.example.asm_ph42693.Modal.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -33,24 +35,42 @@ public interface ApiService {
             .build()
             .create(ApiService.class);
     @GET("students")
-    Call<List<SinhVien>> getData();
-    @POST("students/add")
-    Call<SinhVien> addStudent(@Body SinhVien sinhVien);
+    Call<Response<List<SinhVien>>> getData();
 
     @Multipart
     @POST("students/add")
-    Call<SinhVien> addStudentPicker(
+    Call<Response<SinhVien>> addStudent(
             @Part("masv") RequestBody masv,
             @Part("name") RequestBody name,
             @Part("point") RequestBody point,
             @Part MultipartBody.Part avatar);
 
-
     @DELETE("students/delete/{id}")
-    Call<SinhVien> deleteStudent(@Path("id") String idStudent);
+    Call<Response<SinhVien>> deleteStudent(@Path("id") String idStudent);
 
-
+    @Multipart
     @PUT("students/update/{id}")
-    Call<SinhVien> updateStudent(@Path("id") String idStudent,
-                                 @Body SinhVien sinhVien);
+    Call<Response<SinhVien>> updateStudent(
+            @Path("id") String idStudent,
+            @Part("masv") RequestBody masv,
+            @Part("name") RequestBody name,
+            @Part("point") RequestBody point,
+            @Part MultipartBody.Part avatar);
+
+    @Multipart
+    @POST("register")
+    Call<Response<User>> registerUser(@Part("username") RequestBody username,
+                            @Part("password") RequestBody password,
+                            @Part("email") RequestBody email,
+                            @Part("fullname") RequestBody fullname,
+                            @Part MultipartBody.Part avatar );
+
+    @POST("login")
+    Call<Response<User>> loginUser(@Body User user);
+
+    @GET("search")
+    Call<Response<List<SinhVien>>> searchStudent(@Query("key") String key);
+
+    @GET("sort")
+    Call<Response<List<SinhVien>>> sortStudent(@Query("type") Integer type);
 }

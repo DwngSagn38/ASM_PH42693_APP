@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.asm_ph42693.Api.ApiService;
 import com.example.asm_ph42693.Home;
+import com.example.asm_ph42693.Modal.Response;
 import com.example.asm_ph42693.Modal.SinhVien;
 import com.example.asm_ph42693.R;
 
@@ -31,7 +32,6 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
-import retrofit2.Response;
 
 public class SinhVienAdapter extends RecyclerView.Adapter<SinhVienAdapter.viewHolder> {
     private final Context context;
@@ -79,19 +79,22 @@ public class SinhVienAdapter extends RecyclerView.Adapter<SinhVienAdapter.viewHo
                     builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ApiService.apiService.deleteStudent(idStudent).enqueue(new Callback<SinhVien>() {
+                            Call<Response<SinhVien>> call = ApiService.apiService.deleteStudent(sv.get_id());
+                            call.enqueue(new Callback<Response<SinhVien>>() {
                                 @Override
-                                public void onResponse(Call<SinhVien> call, Response<SinhVien> response) {
-                                    if (response.isSuccessful()) {
-                                        Toast.makeText(context, "Delete success", Toast.LENGTH_SHORT).show();
-                                        list.remove(position);
-                                        notifyDataSetChanged();
+                                public void onResponse(Call<Response<SinhVien>> call, retrofit2.Response<Response<SinhVien>> response) {
+                                    if (response.isSuccessful()){
+                                        if (response.body().getStatus() == 200){
+                                            list.remove(position);
+                                            notifyDataSetChanged();
+                                            Toast.makeText(context, response.body().getMessenger(), Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 }
 
                                 @Override
-                                public void onFailure(Call<SinhVien> call, Throwable t) {
-                                    Toast.makeText(context, "Delete fail", Toast.LENGTH_SHORT).show();
+                                public void onFailure(Call<Response<SinhVien>> call, Throwable t) {
+                                    Toast.makeText(context, "Fail", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
